@@ -4,12 +4,14 @@ pragma solidity ^0.4.23;
 import "../mixin/RootChainValidator.sol";
 import "../lib/RLP.sol";
 import "../lib/BytesLib.sol";
+import "../lib/SafeMath.sol";
 
 
 contract BalanceValidator is RootChainValidator {
     using RLP for bytes;
     using RLP for RLP.RLPItem;
     using RLP for RLP.Iterator;
+    using SafeMath for uint256;
 
     // input transactions 
     function validateBalance(bytes tx1, bytes tx2) public returns(bool){
@@ -26,7 +28,7 @@ contract BalanceValidator is RootChainValidator {
     }
 
     function validateParams(uint256 input1, uint256 input2, uint256 output1, uint256 output2) returns (bool) {
-        if ((input1+input2) == (output1+output2))
+        if ((input1.add(input2)) == (output1.add(output2)))
             return true;
         else
             return false;
