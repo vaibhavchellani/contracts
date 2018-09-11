@@ -13,131 +13,124 @@ contract avlTree {
 	node root;
   uint256 count = 0;
   constructor() public {
-  //   	void Init()
-	// {
-	// 	R = NIL = new Node<T>;
-	// 	NIL->h = 0;
-	// 	NIL->left = NIL->right = NULL;
-	// }
+  	root = NIL = node();
+		NIL.height = 0;
+		NIL.left = NIL.right = NULL;
   }
 
 
   function getHeight(node n){
-		n.height = 1 + math.Max(n.left.height, n.right.height);
+		n.height = 1 + math.max256(n.left.height, n.right.height);
   }
 
 
 
-function search() public returns(bool){
-	// bool Search(Node<T> *N, T val)
-	// {
-	// 	if (N == NIL) return false;
+function search(node n, uint256 value) public returns(bool){
+	if (n == NIL) {  // add correct condition solidity
+			return false;
+	}
 
-	// 	if (N->value == val) return true;
+	if (n.value == value) {
+		return true;
+	}
 
-	// 	if (val < N->value)
-	// 		return Search(N->left, val);
-	// 	else
-	// 		return Search(N->right, val);
-	// }
+	if (val < n.value){
+		return search(n.left, value);
+	}
+	else{
+		return search(n.right, value);
+	}
+
 }
 
-function insert() returns(node){
-	// Node<T>* Insert(Node<T> *N, T val)
-	// {  
-	// 	if (N == NIL)
-	// 	{
-	// 		N = new Node<T>;
-	// 		N->value = val;
-	// 		N->left = N->right = NIL;
-	// 		N->h = 1;
+function insert(node n, uint256 value) returns(node){
+		if (n == NIL) {
+			n = node();
+			n.value = value;
+			n.left = n.right = NIL;
+			n.height = 1;
+			return n;
+		}
 
-	// 		return N;
-	// 	}
-
-	// 	if (val <= N->value) N->left = Insert(N->left, val);
-	// 	else N->right = Insert(N->right, val);
-
-	// 	return Balance(N);
-	// }
+		if (val <= n.value){
+			 n.left = insert(n.left, value);
+		}
+		else {
+			n.right = insert(n.right, value);
+		}
+		return balance(n);
 }
 
-function delete() returns(node){
-	// Node<T>* Delete(Node<T> *N, T val)
-	// {
-	// 	Node<T> *t;
-	// 	if (N == NIL) return N;
-	// 	if (N->value == val)
-	// 	{
-	// 		if (N->left == NIL || N->right == NIL)
-	// 		{
-	// 			if (N->left == NIL) t = N->right;
-	// 			else t = N->left;
-	// 			delete N;
-	// 			return t;
-	// 		}
-	// 		else
-	// 		{
-	// 			for (t = N->right; t->left != NIL; t = t->left);
-	// 			N->value = t->value;
-	// 			N->right = Delete(N->right, t->value);
-	// 			return Balance(N);
-	// 		}
-	// 	}
+function delete(ndoe n, uint256 value) returns(node){
+		ndoe temp;
+		if (n == NIL) {
+			return n;
+		}
+		if (n.value == value)
+		{
+			if (n.left == NIL || n.right == NIL)
+			{
+				if (n.left == NIL){
+					 temp = n.right;
+				}
+				else{
+					 temp = n.left;
+				}
+				delete n;
+				return temp;
+			}
+			else
+			{
+				for (temp = n.right; temp.left != NIL; temp = temp.left);
+				n.value = temp.value;
+				n.right = Delete(n.right, temp.value);
+				return Balance(n);
+			}
+		}
 
-	// 	if (val < N->value) N->left = Delete(N->left, val);
-	// 	else N->right = Delete(N->right, val);
+		if (value < n.value) n.left = Delete(n.left, value);
+		else n.right = Delete(n.right, value);
 
-	// 	return Balance(N);
-	// }
+		return Balance(n);
 }
 function rotateLeft(node n) {
-	// Node<T>* RotateLeft(Node<T> *N)
-	// {
-	// 	Node<T> *t = N->left;
-	// 	N->left = t->right;
-	// 	t->right = N;
-	// 	GetHeight(N);
-	// 	GetHeight(t);
+		node temp = n.left;
+		n.left = temp.right;
+		temp.right = n;
+		getHeight(n);
+		getHeight(temp);
 
-	// 	return t;
-	// }
+		return temp;
 }
 
 function rotateRight (node n){
-	// Node<T>* RotateRight(Node<T> *N)
-	// {
-	// 	Node<T> *t = N->right;
-	// 	N->right = t->left;
-	// 	t->left = N;
-	// 	GetHeight(N);
-	// 	GetHeight(t);
+		node temp = n.right;
+		n.right = temp.left;
+		temp.left = n;
+		getHeight(n);
+		getHeight(temp);
 
-	// 	return t;
-	// }
+		return temp;
 }
 
 function balance(node n) { 
-	// Node<T>* Balance(Node<T> *N)
-	// {
-	// 	GetHeight(N);
-
-	// 	if (N->left->h > N->right->h + 1)
-	// 	{
-	// 		if (N->left->right->h > N->left->left->h)
-	// 			N->left = RotateRight(N->left);
-	// 		N = RotateLeft(N);
-	// 	}
-	// 	else
-	// 	if (N->right->h > N->left->h + 1)
-	// 	{
-	// 		if (N->right->left->h > N->right->right->h)
-	// 			N->right = RotateLeft(N->right);
-	// 		N = RotateRight(N);
-	// 	}
-
-	// 	return N;
-	// }
+		getHeight(n);
+		if (n.left.height > n.right.height + 1)
+		{
+			if (n.left.right.height > n.left.left.height){
+				n.left = rotateRight(n.left);
+			}
+			n = rotateLeft(n);
+		}
+		else
+		if (n.right.height > n.left.height + 1)
+		{
+			if (n.right.left.height > n.right.right.height){
+				n.right = rotateLeft(n.right);
+		}
+			n = rotateRight(n);
+		}
+		return n;
 }
 
 
