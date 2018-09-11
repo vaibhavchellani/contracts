@@ -7,6 +7,7 @@ contract avlTree {
     uint256 value;
     node left;
     node right;
+		uint256 height;
   }
 
 	node root;
@@ -21,11 +22,8 @@ contract avlTree {
   }
 
 
-  function getHeight(){
-	// void GetHeight(Node<T> *N)
-	// {
-	// 	N->h = 1 + Max(N->left->h, N->right->h);
-	// }
+  function getHeight(node n){
+		n.height = 1 + math.Max(n.left.height, n.right.height);
   }
 
 
