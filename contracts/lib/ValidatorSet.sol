@@ -5,39 +5,38 @@ contract ValidatorSet {
 
   struct Validator {
     uint256 stake;
-    int accumulator;
+    int256 accumulator;
     address proposer;
   }
 
-  int private sum;
+  uint256 private sum;
   Validator[] public validators;
   address public currentProposer;
 
   constructor() public {
     sum = 0;
-    count = 0;
     currentProposer = address(0);
   }
 
-  function addValidator(uint256 stake) public {
+  function addValidator(uint256 stake, address proposer) public {
     require(stake > 0);
-    validators.push(Validator(stake, stake, count));
+    validators.push(Validator(stake, int256(stake), proposer));
     sum += stake;
   }
 
-  function getProposers() public returns(uint256) {
+  function getProposers() public returns(address) {
     require(validators.length > 0);
     if (currentProposer == address(0)) {
       return getProposer();
     }
 
     for (uint8 i = 0; i < validators.length; i++) {
-      validators[i].accumulator += validators[i].stake; 
+      validators[i].accumulator += int(validators[i].stake); 
     }
     return getProposer();
   }
 
-  function getProposer() private returns (uint256) {
+  function getProposer() private returns (address) {
     int max = -99999999999999;//  use -ve max
     uint8 index = 0;
     for (uint8 i = 0; i < validators.length; i++) {
@@ -46,21 +45,21 @@ contract ValidatorSet {
         index = i;
       }
     }
-    validators[index].accumulator -= sum;
+    validators[index].accumulator -= int(sum);
     currentProposer = validators[index].proposer;
     return validators[index].proposer;
   }
 
   // test pilot 
-  function getNProposers(uint256 n) public returns (uint256[]) {
-    addValidator(4);
-    addValidator(2);
-    addValidator(2);
-    addValidator(2);
-    uint256[] proposers;
+  function getNProposers(uint8 n) public returns (address[]) {
+    addValidator(4, address(1));
+    addValidator(2, address(2));
+    addValidator(2, address(3));
+    addValidator(2, address(4));
+    address[] memory proposers = new address[](n);
 
-    for (uint256 i = 0; i < n; i++) {
-      proposers.push(getProposers());
+    for (uint8 i = 0; i < n; i++) {
+      proposers[i] = getProposers();
     }
     return proposers;
   }
