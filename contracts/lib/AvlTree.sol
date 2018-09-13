@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import { Math } from "openzeppelin-solidity/contracts/math/Math.sol";
 
-contract avlTree {
+contract AvlTree {
   struct node {
     uint256 value;
     uint256 left;
@@ -91,30 +91,30 @@ function delete(ndoe n, uint256 value) returns(node){
 
 		return Balance(n);
 }
-function rotateLeft(node n) {
-		node temp = n.left;
-		n.left = temp.right;
-		temp.right = n;
+function rotateLeft(uint256 n) {
+		uint256 temp = tree[n].left;
+		tree[n].left = tree[temp].right;
+		tree[temp].right = n;
 		getHeight(n);
 		getHeight(temp);
 
 		return temp;
 }
 
-function rotateRight (node n){
-		node temp = n.right;
-		n.right = temp.left;
-		temp.left = n;
+function rotateRight (uint256 n){
+		uint256 temp = tree[n].right;
+		tree[n].right = tree[temp].left;
+		tree[temp].left = n;
 		getHeight(n);
 		getHeight(temp);
 
 		return temp;
 }
 
-function balance(node n) { 
+function balance(uint256 n) { 
 		getHeight(n);
-		if (n.left.height > n.right.height + 1)
-		{
+		if (tree[tree[n].left].height > tree[tree[n].right].height + 1)
+		{			tree[[tree[n].left].right]
 			if (n.left.right.height > n.left.left.height){
 				n.left = rotateRight(n.left);
 			}

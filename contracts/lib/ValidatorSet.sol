@@ -9,10 +9,16 @@ contract ValidatorSet {
     uint256 id;
   }
 
-  uint256 count = 0;
-  bool flag = false;
-  int sum = 0;
+  uint256 count;
+  bool isFirst;
+  int sum;
   Validator[] validators;
+
+  constructor() public {
+		sum = 0;
+    count = 0;
+    isFirst = true;
+  }
 
   function addValidator(int stake) public {
     validators.push(Validator(stake, stake, count));
@@ -22,8 +28,8 @@ contract ValidatorSet {
 
   function getProposers() public returns(uint256){
     require(validators.length > 0);
-    if (!flag) {
-      flag = true;
+    if (isFirst) {
+      isFirst = false;
       return getProposer();
     }
 
@@ -64,4 +70,4 @@ contract ValidatorSet {
     0,1,2,3,0,0,1,2,3,0,0,1,2,3,0,0,1,2,3,0
     getProposer();// just one time
     getProposers() */
-  }
+}
