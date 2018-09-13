@@ -4,63 +4,62 @@ pragma solidity ^0.4.24;
 contract ValidatorSet {
 
   struct Validator {
-    int stake;
-    int acc;
-    uint256 id;
+    uint256 stake;
+    int accumulator;
+    address proposer;
   }
 
-  uint256 count;
-  bool isFirst;
-  int sum;
-  Validator[] validators;
+  int private sum;
+  Validator[] public validators;
+  address public currentProposer;
 
   constructor() public {
-		sum = 0;
+    sum = 0;
     count = 0;
-    isFirst = true;
+    currentProposer = address(0);
   }
 
-  function addValidator(int stake) public {
+  function addValidator(uint256 stake) public {
+    require(stake > 0);
     validators.push(Validator(stake, stake, count));
     sum += stake;
-    count += 1;
   }
 
-  function getProposers() public returns(uint256){
+  function getProposers() public returns(uint256) {
     require(validators.length > 0);
-    if (isFirst) {
-      isFirst = false;
+    if (currentProposer == address(0)) {
       return getProposer();
     }
 
-    for (uint8 i = 0; i<validators.length; i++) {
-      validators[i].acc += validators[i].stake; 
+    for (uint8 i = 0; i < validators.length; i++) {
+      validators[i].accumulator += validators[i].stake; 
     }
     return getProposer();
   }
 
-  function getProposer() private returns (uint256){
+  function getProposer() private returns (uint256) {
     int max = -99999999999999;//  use -ve max
     uint8 index = 0;
-    for (uint8 i = 0; i<validators.length; i++) {
-      if (max < validators[i].acc){
-        max = validators[i].acc;
+    for (uint8 i = 0; i < validators.length; i++) {
+      if (max < validators[i].accumulator){
+        max = validators[i].accumulator;
         index = i;
       }
     }
-    validators[index].acc -= sum;
-    return validators[index].id;
+    validators[index].accumulator -= sum;
+    currentProposer = validators[index].proposer;
+    return validators[index].proposer;
   }
 
   // test pilot 
-  function getNgetProposers(uint256 n) public returns(uint256[]) {
+  function getNProposers(uint256 n) public returns (uint256[]) {
     addValidator(4);
     addValidator(2);
     addValidator(2);
     addValidator(2);
     uint256[] proposers;
 
-    for (uint256 i = 0; i<n; i++) {
+    for (uint256 i = 0; i < n; i++) {
       proposers.push(getProposers());
     }
     return proposers;
