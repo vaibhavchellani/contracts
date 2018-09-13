@@ -37,7 +37,7 @@ contract ValidatorSet {
   }
 
   function getProposer() private returns (address) {
-    int max = -99999999999999;//  use -ve max
+    int256 max = -99999999999999;//  use -ve max
     uint8 index = 0;
     for (uint8 i = 0; i < validators.length; i++) {
       if (max < validators[i].accumulator){
