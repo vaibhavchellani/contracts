@@ -97,12 +97,11 @@ contract RootChain is Ownable, IRootChain {
   //
   // External functions
   //
-
-  function submitHeaderBlock(bytes vote, bytes sigs, bytes extradata) external {
+ function submitHeaderBlock(bytes vote, bytes sigs, bytes extradata) external {
     RLP.RLPItem[] memory dataList = vote.toRLPItem().toList();
-    require(keccak256(dataList[0].toData()) == chain, "Chain ID not same");
-    require(keccak256(dataList[1].toData()) == roundType, "Round type not same ");
-    require(dataList[4].toByte() == voteType, "Vote type not same");
+    // require(keccak256(dataList[0].toData()) == chain, "Chain ID not same");
+    // require(keccak256(dataList[1].toData()) == roundType, "Round type not same ");
+    // require(dataList[4].toByte() == voteType, "Vote type not same");
 
     // validate extra data using getSha256(extradata)
     require(keccak256(dataList[5].toData()) == keccak256(bytes20(sha256(extradata))), "Extra data is invalid");
@@ -110,8 +109,8 @@ contract RootChain is Ownable, IRootChain {
     // extract end and assign to current child
     dataList = extradata.toRLPItem().toList();
 
-    // check proposer
-    require(msg.sender == dataList[0].toAddress(), "Invalid proposer");
+    // // check proposer
+    // require(msg.sender == dataList[0].toAddress(), "Invalid proposer");
     uint256 start = currentChildBlock();
     if (start > 0) {
       start = start.add(1);
@@ -124,35 +123,35 @@ contract RootChain is Ownable, IRootChain {
     // Make sure we are adding blocks
     require(end > start, "Not adding blocks");
 
-    // Make sure enough validators sign off on the proposed header root
-    require(stakeManager.checkSignatures(keccak256(vote), sigs), "Sigs are invalid");
+    // // Make sure enough validators sign off on the proposed header root
+    // require(stakeManager.checkSignatures(keccak256(vote), sigs), "Sigs are invalid");
 
-    // Add the header root
+    // // Add the header root
     HeaderBlock memory headerBlock = HeaderBlock({
       root: root,
       start: start,
       end: end,
-      createdAt: block.timestamp,
+      createdAt: block.number,
       proposer: msg.sender
     });
     headerBlocks[_currentHeaderBlock] = headerBlock;
 
-    // emit new header block
+    // // emit new header block
     emit NewHeaderBlock(
-      msg.sender,
+      dataList[0].toAddress(),
       _currentHeaderBlock,
       headerBlock.start,
       headerBlock.end,
       root
     );
 
-    // update current header block
+    // // update current header block
     _currentHeaderBlock = _currentHeaderBlock.add(CHILD_BLOCK_INTERVAL);
 
-    // finalize commit
-    depositManager.finalizeCommit(_currentHeaderBlock);
-    withdrawManager.finalizeCommit(_currentHeaderBlock);
-    stakeManager.finalizeCommit();
+    // // finalize commit
+    // depositManager.finalizeCommit(_currentHeaderBlock);
+    // withdrawManager.finalizeCommit(_currentHeaderBlock);
+    // stakeManager.finalizeCommit();
 
     // TODO add rewards
   }
